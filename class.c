@@ -5,68 +5,68 @@
 
 typedef struct 
 {
-    char **key; //yuraqanchur property-ii anun
-    int  *offsets; // hamapatasxan indexner
-    int  count; // property-neri qanak
+    char **key; 
+    int  *offsets; 
+    int  count; 
 }HiddenClass;
 
 typedef char* JSValue;
 
 typedef struct 
 {
-    HiddenClass *shape; // hxum depi hiden cllas, inch dashter uni u te vortex en  slots um
-    char **slots;  //arjeqneri zangvac 
+    HiddenClass *shape; 
+    char **slots; 
 }JSObject;
 
-HiddenClass *createHiddenClass(){    // functia vor uni hxum depi HiddenClass struct
+HiddenClass *createHiddenClass(){  
     HiddenClass *a = malloc(sizeof(HiddenClass));
-    a->key = NULL;   // ays mi qani toxum maqrum em malloci tvac hishoxutyun@ axbic
+    a->key = NULL; 
     a->offsets = NULL;
     a->count = 0;
     return a; 
 }
 
-JSObject *createObject(){ // datarka obyekts la der
+JSObject *createObject(){ 
     JSObject *obj = malloc(sizeof(JSObject));
     if(obj != NULL){
-    obj->shape = createHiddenClass();   // nakaragrum e propert-ineri anunner@
-    obj->slots = NULL;  // arjeqneri zangvac e vortex pahvum en propertyner@
+    obj->shape = createHiddenClass();   
+    obj->slots = NULL;
     }
     return obj;
 }
 
-void addpropertyShape(HiddenClass *shape, const char *key){ //avelacnm em property i shape i mech
+void addpropertyShape(HiddenClass *shape, const char *key){
     shape->count++;  //avelacnum em qanak@
-    shape->key = realloc(shape->key,shape->count * sizeof (char *));    // obshi mecacrel em zangvacner@ 
+    shape->key = realloc(shape->key,shape->count * sizeof (char *));  
     shape->offsets = realloc(shape->offsets, shape->count * sizeof (int));
 
     if(shape->key != NULL && shape->offsets != NULL){
-        shape->key[shape->count - 1] = malloc(strlen(key) + 1);  //hatkacnem tex
-        strcpy(shape->key[shape->count - 1], key); // copy em anum teqst@
-        shape->offsets[shape->count - 1] = shape->count - 1;  // talis em property i dirq@ zangvacum slots
+        shape->key[shape->count - 1] = malloc(strlen(key) + 1);
+        strcpy(shape->key[shape->count - 1], key); 
+        shape->offsets[shape->count - 1] = shape->count - 1; 
     }
 }
 
-void js_setproperty(JSObject *obj,const char *key,JSValue value){   //avelacnm em property i objecti mech
+void js_setproperty(JSObject *obj,const char *key,JSValue value){ 
     int found = -1;
-    for(int i = 0; i < obj->shape->count; i++){         //stugum em ardyoq key arden ka shape um
+    for(int i = 0; i < obj->shape->count; i++){         
         if(strcmp(obj->shape->key[i],key) == 0){
             found = i;
             break;
         }
     }
-    if(found != -1){    // ete key ka taza arjeq em dnum slots um
+    if(found != -1){ 
         obj->slots[found] = value;
         return;
     }
-    addpropertyShape (obj->shape, key);     // es nor property e
-    obj->slots = realloc(obj->slots, obj->shape->count * sizeof(JSValue));   //mecacnum em slots zangvac@ arjeqner pahelu hamar
+    addpropertyShape (obj->shape, key);
+    obj->slots = realloc(obj->slots, obj->shape->count * sizeof(JSValue)); 
 
-    int offset = obj->shape->count - 1;  // taza property arjeq@ dnum em ir offset um
+    int offset = obj->shape->count - 1;
     obj->slots[offset] = value;
 }
 
-JSValue js_getproperty(JSObject *obj, const char *key){  //het em talis property i arjeq@ shape i offset ov
+JSValue js_getproperty(JSObject *obj, const char *key){ 
     for(int i = 0; i < obj->shape->count; i++){
         if(strcmp(obj->shape->key[i],key) == 0){
             int offset = obj->shape->offsets[i];
